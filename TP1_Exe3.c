@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <ctime>
 
 int nShareVar;
 void* print_message(void* ptr);
@@ -31,7 +30,7 @@ void* print_message(void* ptr)
 {
 	srand(time(0));
 	char* msg = (char*) ptr;
-	while(true)
+	while(1)
 	{
 		nShareVar++;
 		sleep(rand()%2);
