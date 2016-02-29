@@ -9,22 +9,22 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int counter;
+int numOfPassengersOnBus;
 int flag;
 void* print_message(void* ptr);
-pthread_cond_t condSet, condReset;
+pthread_cond_t condFull, condAvailable;
 pthread_mutex_t lock;
 
 int main(int argc, char* argv[])
 {
-	pthread_cond_init(&condSet, NULL);
-	pthread_cond_init(&condReset, NULL);
+	pthread_cond_init(&condFull, NULL);
+	pthread_cond_init(&condAvailable, NULL);
 	pthread_mutex_init(&lock, NULL);
 	pthread_t tProducer, tConsumer1, tConsumer2;
 	const char* msg1 = "Producer";
 	const char* msg2 = "Consumer_A";
 	const char* msg3 = "Consumer_B";
-	counter = 0;
+	numOfPassengersOnBus = 0;
 	int r1 = pthread_create(&tProducer, NULL, print_message, (void*)msg1 );
 	sleep(1);
 	int r2 = pthread_create(&tConsumer1, NULL, print_message, (void*)msg2 );
@@ -49,16 +49,16 @@ void* print_message(void* ptr)
 			while(flag)
 			{
 				printf("%s waits flag to become 0...\n", msg);
-				pthread_cond_wait(&condSet, &lock);
+				pthread_cond_wait(&condFull, &lock);
 				printf("%s is waken.\n", msg);
 			}
 
-			int oldVal = counter;
-			counter++;
-			printf("%s %d=>%d with flag = %s\n", msg, oldVal, counter, flag?"1":"0");
+			int oldVal = numOfPassengersOnBus;
+			numOfPassengersOnBus++;
+			printf("%s %d=>%d with flag = %s\n", msg, oldVal, numOfPassengersOnBus, flag?"1":"0");
 			flag=1;
 			printf("%s wakes up sleeping threads with flag = 1.\n", msg);
-			pthread_cond_broadcast(&condReset);
+			pthread_cond_broadcast(&condAvailable);
 			pthread_mutex_unlock(&lock);
 			sleep(rand()%2);
 		}
@@ -68,16 +68,16 @@ void* print_message(void* ptr)
 			while(!flag)
 			{
 				printf("%s waits flag to become 1...\n", msg);
-				pthread_cond_wait(&condReset, &lock);
+				pthread_cond_wait(&condAvailable, &lock);
 				printf("%s is waken.\n", msg);
 			}
 
-			int oldVal = counter;
-			counter--;
-			printf("%s %d=>%d with flag = %s\n", msg, oldVal, counter, flag?"1":"0");
+			int oldVal = numOfPassengersOnBus;
+			numOfPassengersOnBus--;
+			printf("%s %d=>%d with flag = %s\n", msg, oldVal, numOfPassengersOnBus, flag?"1":"0");
 			flag = 0;
 			printf("%s wakes up sleeping threads with flag = 0.\n", msg);
-			pthread_cond_broadcast(&condSet);
+			pthread_cond_broadcast(&condFull);
 			pthread_mutex_unlock(&lock);
 			sleep(rand()%4);
 		}

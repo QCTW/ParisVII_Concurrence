@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int counter;
+int numOfPassengersOnBus;
 int turn;
 void* print_message(void* ptr);
 pthread_mutex_t verrou;
@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 	pthread_t tProducer, tConsumer1, tConsumer2;
 	const char* msg1 = "Producer";
 	const char* msg2 = "Consumer";
-	counter = 0;
+	numOfPassengersOnBus = 0;
 	struct node* list;
 	list = malloc( sizeof(struct node) );
 	struct node* top;
@@ -49,24 +49,24 @@ void* print_message(void* ptr)
 	{
 		if(msg[0]=='P') //Producer
 		{
-			while(counter>0){}; //Wait if counter > 0
+			while(numOfPassengersOnBus>0){}; //Wait if counter > 0
 			pthread_mutex_lock(&verrou);
-			if(counter<=0)
+			if(numOfPassengersOnBus<=0)
 			{
-				counter++;
-				printf("%s produced %d\n", msg, counter);
+				numOfPassengersOnBus++;
+				printf("%s produced %d\n", msg, numOfPassengersOnBus);
 			}
 			pthread_mutex_unlock(&verrou);
 			sleep(rand()%2);
 		}
 		else //Consumer
 		{
-			while(counter<=0){}; //Wait if counter < 0
+			while(numOfPassengersOnBus<=0){}; //Wait if counter < 0
 			pthread_mutex_lock(&verrou);
-			if(counter>0)
+			if(numOfPassengersOnBus>0)
 			{
-				counter--;
-				printf("%s consumed %d\n", msg, counter);
+				numOfPassengersOnBus--;
+				printf("%s consumed %d\n", msg, numOfPassengersOnBus);
 			}
 			pthread_mutex_unlock(&verrou);
 			sleep(rand()%4);
