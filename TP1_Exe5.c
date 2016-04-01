@@ -8,15 +8,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <ctime>
 
-bool flag1, flag2;
+int flag1, flag2;
 void* print_message(void* ptr);
 
 int main(int argc, char* argv[])
 {
-	flag1 = true;
-	flag2 = true;
+	flag1 = 1;
+	flag2 = 1;
 	pthread_t tProducer, tConsumer;
 	const char* msg1 = "A_Thread";
 	const char* msg2 = "B_Thread";
@@ -34,7 +33,7 @@ void* print_message(void* ptr)
 {
 	srand(time(0));
 	char* msg = (char*) ptr;
-	while(true)
+	while(1)
 	{
 		if(msg[0]=='A')
 		{
@@ -44,7 +43,7 @@ void* print_message(void* ptr)
 				sleep(1);
 			}
 
-			flag1 = false;
+			flag1 = 0;
 			printf("%s changed flag1 true->false\n", msg);
 
 			while(!flag2)
@@ -53,7 +52,7 @@ void* print_message(void* ptr)
 				sleep(1);
 			}
 
-			flag2 = false;
+			flag2 = 0;
 			printf("%s changed flag2 true->false\n", msg);
 		}
 		else
@@ -64,7 +63,7 @@ void* print_message(void* ptr)
 				sleep(1);
 			}
 
-			flag1 = true;
+			flag1 = 1;
 			printf("%s changed flag1 false->true\n", msg);
 
 			while(flag2)
@@ -72,7 +71,7 @@ void* print_message(void* ptr)
 				printf("%s waits flag2 to change to false\n", msg);
 				sleep(1);
 			}
-			flag2 = true;
+			flag2 = 1;
 			printf("%s changed flag2 false->true\n", msg);
 		}
 	}
